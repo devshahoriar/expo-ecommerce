@@ -20,11 +20,31 @@ import { POPPINS, POPPINS_BOLD, POPPINS_LITE, POPPINS_MED } from '../font'
 import Header from '../components/Header'
 import sliderData from '../data/Slider'
 import Products from '../components/Products'
+import {
+  useGetProdutsWithOfferPriceQuery,
+  useGetRandomQuery,
+} from '../redux/api/productApi'
+import { useGetSlideQuery } from '../redux/api/homeApi'
+import { serverUrl } from '../data/constant'
 
 const Home = ({ navigation }) => {
   const th = useTheme()
   const [activeSlide, setActiveSlide] = useState(0)
   const slideRef = useRef()
+  const { isError, isLoading, data: pData } = useGetRandomQuery()
+  const {
+    isError: oErr,
+    isLoading: oLod,
+    data: oData,
+  } = useGetProdutsWithOfferPriceQuery()
+  const {
+    isError: slideErr,
+    isLoading: slideLoading,
+    data: slidesD,
+  } = useGetSlideQuery()
+
+  const slides = slidesD?.data.attributes.slides
+
 
   useEffect(() => {
     NetInfo.fetch().then((state) => {
@@ -35,6 +55,7 @@ const Home = ({ navigation }) => {
   }, [])
 
   const item = ({ item }) => {
+  
     return (
       <View
         style={{
@@ -46,7 +67,9 @@ const Home = ({ navigation }) => {
         <Image
           style={{ height: 200, width: th.width * 0.95, borderRadius: 5 }}
           resizeMode="cover"
-          source={{ uri: item.url }}
+          source={{
+            uri: serverUrl + item.img.data.attributes.formats.large.url,
+          }}
         />
       </View>
     )
@@ -57,7 +80,7 @@ const Home = ({ navigation }) => {
       <View style={{ flex: 1, margin: 5 }}>
         <TouchableOpacity
           style={{ backgroundColor: '#cecece', borderRadius: 5 }}
-          onPress={()=> navigation.navigate('Search')}
+          onPress={() => navigation.navigate('Search')}
         >
           <Image
             style={{ height: 60, margin: 5 }}
@@ -92,7 +115,7 @@ const Home = ({ navigation }) => {
 
   return (
     <>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <SafeAreaView
           style={{
             backgroundColor: th.bg,
@@ -106,7 +129,7 @@ const Home = ({ navigation }) => {
           <View style={{ marginTop: 20, height: 200, position: 'relative' }}>
             <FlatList
               ref={slideRef}
-              data={sliderData}
+              data={slides}
               renderItem={item}
               keyExtractor={(item) => item.id}
               horizontal
@@ -153,8 +176,17 @@ const Home = ({ navigation }) => {
             <CatItem />
             <CatItem />
           </View>
-          <Products />
-          <Products title="Just For you." />
+          {isLoading ? (
+            <Text>Loading....</Text>
+          ) : (
+            <Products title="Just For you." products={oData} />
+          )}
+
+          {oLod ? (
+            <Text>Loading...</Text>
+          ) : (
+            <Products products={pData} title="Highlight." />
+          )}
           <Text
             style={{
               color: th.text,
@@ -174,7 +206,7 @@ const Home = ({ navigation }) => {
                 color: th.text,
                 textAlign: 'center',
                 fontFamily: POPPINS_BOLD,
-                fontSize:20
+                fontSize: 20,
               }}
             >
               Shuvo

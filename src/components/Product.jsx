@@ -1,8 +1,21 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { POPPINS_BOLD, POPPINS_MED } from '../font'
 import useTheme from '../hooks/useTheme'
-import { useNavigation } from '@react-navigation/native';
-const Product = () => {
+import { useNavigation } from '@react-navigation/native'
+import { serverUrl } from '../data/constant'
+const Product = (product) => {
+
+  const { name, price, offerPrice, slug, media } = product?.product
+    ?.attributes || {
+    name: 'nn',
+    price: 100,
+    slug: 'd',
+    offerPrice: 0,
+  }
+  const img =
+    media?.data[0].attributes?.formats.medium.url ||
+    '/uploads/medium_md_salman_iiqg2xbmvk0_unsplash_48794a5e9f.jpg'
+
   const th = useTheme()
   const navagation = useNavigation()
 
@@ -13,23 +26,18 @@ const Product = () => {
     },
     catV: {
       width: '50%',
-      
     },
   })
 
   const _hendelPress = () => {
-    navagation.navigate('Product',{slug:'pppp'})
+    navagation.navigate('Product', { id: product?.product?.id })
   }
 
-  const url =
-    'https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80'
   return (
     <View style={styles.catV}>
-      <View style={{ margin: 3,padding:10 }}>
-        <TouchableOpacity
-        onPress={_hendelPress}
-        >
-          <Image style={styles.catImg} source={{ uri: url }} />
+      <View style={{ margin: 2, padding: 10 }}>
+        <TouchableOpacity onPress={_hendelPress}>
+          <Image style={styles.catImg} source={{ uri: serverUrl + img }} />
           <Text
             style={{
               fontFamily: POPPINS_MED,
@@ -38,15 +46,15 @@ const Product = () => {
               color: th.text,
             }}
           >
-            Name Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Voluptas similique numquam officiis nobis accusantium quam facilis
-            quibusdam sequi blanditiis deleniti. Blanditiis est ut inventore
-            maxime dolores modi quae, nesciunt consectetur!
+            {name}
           </Text>
-          <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-
-          <Text style={{color:th.text}}>200$</Text>
-          <Text style={{color:"blue"}}>-20%</Text>
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+          >
+            <Text style={{ color: th.text }}>{price}$</Text>
+            <Text style={{ color: 'blue' }}>
+              -{Math.round((price / offerPrice) * 100 - 100).toFixed(2)}%
+            </Text>
           </View>
         </TouchableOpacity>
       </View>

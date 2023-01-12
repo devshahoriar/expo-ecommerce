@@ -1,17 +1,55 @@
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useState } from 'react'
 import {
   View,
   Text,
   ImageBackground,
   TextInput,
-  TouchableOpacity, SafeAreaView, StatusBar
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native'
+import { useDispatch } from 'react-redux'
 import { POPPINS, POPPINS_BOLD, POPPINS_MED } from '../font'
 import useTheme from '../hooks/useTheme'
 import imgLogin from '../images/loginBg.jpg'
+import { useLoginMutation } from '../redux/api/auth'
+import { loginUser } from '../redux/slice/user'
 
 const Login = ({ navigation }) => {
   const them = useTheme()
+  const [err, setErr] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [login, { isError, isLoading, error }] = useLoginMutation()
+  const dispatch = useDispatch()
+
+  const _hendelLogin = async () => {
+    try {
+      const d = await login({
+        identifier: email,
+        password: password,
+      }).unwrap()
+
+      const data = {
+        jwt: d.jwt,
+        email: d.user.email,
+        name: d.user.username,
+      }
+      await AsyncStorage.setItem('jwt', data.jwt)
+      dispatch(loginUser(data))
+      navigation.replace('Home')
+    } catch (errorr) {
+      console.log(error)
+      if (errorr?.data?.error?.message) {
+        setErr(errorr?.data?.error?.message)
+      }
+      if (errorr?.error) {
+        setErr(errorr?.error)
+      }
+    }
+  }
+
   return (
     <>
       <StatusBar backgroundColor={them.status} barStyle={them.bar_style} />
@@ -25,6 +63,7 @@ const Login = ({ navigation }) => {
               justifyContent: 'center',
               alignItems: 'center',
               height: '100%',
+              marginHorizontal: 10,
             }}
           >
             <Text
@@ -37,10 +76,12 @@ const Login = ({ navigation }) => {
               Sign In
             </Text>
             <TextInput
+              onChangeText={(t) => setEmail(t)}
+              value={email}
               style={{
                 backgroundColor: them.main,
                 fontSize: 20,
-                width: '90%',
+                width: '100%',
                 paddingVertical: 10,
                 paddingHorizontal: 10,
                 borderRadius: 5,
@@ -50,10 +91,12 @@ const Login = ({ navigation }) => {
               placeholder="Email"
             />
             <TextInput
+              onChangeText={(t) => setPassword(t)}
+              value={password}
               style={{
                 backgroundColor: them.main,
                 fontSize: 20,
-                width: '90%',
+                width: '100%',
                 paddingVertical: 10,
                 paddingHorizontal: 10,
                 marginTop: 10,
@@ -69,12 +112,11 @@ const Login = ({ navigation }) => {
                 color: 'red',
                 textAlign: 'left',
                 width: '100%',
-                marginLeft: 20,
                 fontSize: 20,
                 marginVertical: 5,
               }}
             >
-              Error
+              {err}
             </Text>
             <TouchableOpacity
               style={{
@@ -83,7 +125,7 @@ const Login = ({ navigation }) => {
                 paddingVertical: 8,
                 marginTop: 10,
               }}
-              onPress={() => console.log('Clicked')}
+              onPress={_hendelLogin}
             >
               <Text
                 style={{

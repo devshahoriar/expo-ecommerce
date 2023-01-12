@@ -42,6 +42,7 @@ const NoData = () => {
         >
           No Internet!
         </Text>
+        <Text>May be backend error!</Text>
         <TouchableOpacity
           onPress={() => BackHandler.exitApp()}
           style={{

@@ -3,8 +3,11 @@ import { POPPINS_MED } from '../font'
 import useTheme from '../hooks/useTheme'
 import Item from './Item'
 
+const Orders = ({ order }) => {
 
-const Orders = () => {
+  const d = order?.attributes
+  const p = JSON.parse(d.products)
+
   const th = useTheme()
   return (
     <View
@@ -16,11 +19,14 @@ const Orders = () => {
         borderBottomColor: 'blue',
       }}
     >
-      <Item />
-      <Item />
-      <Text style={{ color: th.text }}>Order Status : Pending</Text>
-      <Text style={{ color: th.text }}>Address : Bagha</Text>
-      <Text style={{ color: th.text }}>Payment : Bkash</Text>
+      {p?.map((e, i) => (
+        <Item product={e} key={i} />
+      ))}
+      
+      <Text style={{ color: th.text }}>Order Status : {d.status}</Text>
+      <Text style={{ color: th.text }}>Cost : {d.all_price}</Text>
+      <Text style={{ color: th.text }}>Address : {d.address}</Text>
+      <Text style={{ color: th.text }}>Payment : {d.payment}</Text>
     </View>
   )
 }
