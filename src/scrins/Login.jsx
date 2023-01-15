@@ -30,11 +30,13 @@ const Login = ({ navigation }) => {
         identifier: email,
         password: password,
       }).unwrap()
+      console.log(d)
 
       const data = {
         jwt: d.jwt,
         email: d.user.email,
         name: d.user.username,
+        id: d.id,
       }
       await AsyncStorage.setItem('jwt', data.jwt)
       dispatch(loginUser(data))

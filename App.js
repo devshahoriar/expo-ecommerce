@@ -1,4 +1,6 @@
+import 'react-native-gesture-handler'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import '@react-navigation/native-stack'
 import {
   NavigationContainer,
   DefaultTheme,
@@ -16,7 +18,6 @@ import Cart from './src/scrins/Cart'
 import Search from './src/scrins/Search'
 import ProductPage from './src/scrins/ProductPage'
 import ZoomImage from './src/scrins/ZoomImage'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Provider } from 'react-redux'
 import store from './src/redux/store'
 import * as SplashScreen from 'expo-splash-screen'
@@ -26,20 +27,15 @@ import { addAll } from './src/redux/slice/cart'
 import Order from './src/scrins/Order'
 import isServerWork from './src/utils/isServerWork'
 
-SplashScreen.preventAutoHideAsync()
-const Stack = createNativeStackNavigator()
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
 
-export default function App() {
+SplashScreen.preventAutoHideAsync()
+function App() {
+  const Stack = createNativeStackNavigator()
   const scheme = useColorScheme()
   const [appIsReady, setAppIsReady] = useState(false)
   const [initial, setInitialLocation] = useState('Home')
 
-  let [fontsLoaded] = Font.useFonts({
-    poppins: require('./src/font/Poppins-Regular.ttf'),
-    poppins_medium: require('./src/font/Poppins-Medium.ttf'),
-    poppins_lite: require('./src/font/Poppins-Light.ttf'),
-    poppins_bold: require('./src/font/Poppins-Bold.ttf'),
-  })
 
   useEffect(() => {
     const appBoot = async () => {
@@ -93,27 +89,27 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <NavigationContainer onReady={() => onLayoutRootView()}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-            initialRouteName={initial}
-          >
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Nodata" component={NoData} />
-            <Stack.Screen name="Profile" component={MyAccount} />
-            <Stack.Screen name="Cart" component={Cart} />
-            <Stack.Screen name="Order" component={Order} />
-            <Stack.Screen name="Product" component={ProductPage} />
-            <Stack.Screen name="Search" component={Search} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
-            <Stack.Screen name="ZoomImage" component={ZoomImage} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </GestureHandlerRootView>
+      <NavigationContainer onReady={() => onLayoutRootView()}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName={initial}
+        >
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Nodata" component={NoData} />
+          <Stack.Screen name="Profile" component={MyAccount} />
+          <Stack.Screen name="Cart" component={Cart} />
+          <Stack.Screen name="Order" component={Order} />
+          <Stack.Screen name="Product" component={ProductPage} />
+          <Stack.Screen name="Search" component={Search} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="ZoomImage" component={ZoomImage} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </Provider>
   )
 }
+
+export default gestureHandlerRootHOC(App)

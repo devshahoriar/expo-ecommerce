@@ -24,6 +24,7 @@ const MyAccount = ({ navigation }) => {
   const th = useTheme()
   const user = useSelector((s) => s.user)
   const dispatch = useDispatch()
+  console.log(user);
   const { isError, isLoading, data } = useGetOrderQuery(
     {
       id: user.id,
